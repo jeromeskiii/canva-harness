@@ -143,7 +143,8 @@ export function createFooExportPlugin(): HarnessPlugin {
   return {
     manifest,
     async setup(ctx: HarnessContext) {
-      // Register services, push disposables, emit "loaded".
+      // Register services, push disposables.
+      // PluginManager.load() will emit `plugin.loaded` after setup() returns.
     },
   };
 }
@@ -260,8 +261,15 @@ export interface ICanvaDocumentService {
 export const CANVA_DOC_SERVICE_KEY: ServiceKey<ICanvaDocumentService> =
   createServiceKey<ICanvaDocumentService>("canva.document");
 
-// Provider is registered by createCanvaCapabilitiesPlugin():
-ctx.services.register(CANVA_DOC_SERVICE_KEY, new CanvaDocumentService(session));
+// Provider is registered by createCanvaCapabilitiesPlugin() — and crucially,
+// the `Disposable` returned by `register()` is captured and pushed into
+// `ctx.disposables`, so `PluginManager.unload(id)` actually removes the
+// service registration:
+const docDisposable = ctx.services.register(
+  CANVA_DOC_SERVICE_KEY,
+  new CanvaDocumentService(session),
+);
+ctx.disposables.push(docDisposable);
 
 // packages/tools/src/index.ts — Consumer (one of four)
 export const canvaCreateDesignTool: ToolDefinition<{ title: string; format: DesignFormat; ... }> = {

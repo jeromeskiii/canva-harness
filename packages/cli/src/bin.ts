@@ -93,8 +93,8 @@ async function main() {
 
     case "run": {
       const userPrompt = args.slice(1).join(" ") || "Create a Canva presentation slide for AI Architecture";
-      console.log(`[Canva Harness] Executing prompt: "${userPrompt}"`);
-      const result = await harness.agentLoop.runTurn(userPrompt, { isApproved: true });
+      console.log(`[Canva Harness] Executing prompt: "${userPrompt}" (autoApprove=${harness.policy.autoApprove})`);
+      const result = await harness.agentLoop.runTurn(userPrompt, { isApproved: harness.policy.autoApprove });
 
       console.log(
         JSON.stringify(

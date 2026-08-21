@@ -62,4 +62,40 @@ describe("Canva Harness Runtime Core", () => {
     await pm.unload("canva-inspector-plugin");
     expect(() => ctx.services.get(testKey)).toThrow("Service not found");
   });
+
+  it("unloads dependents before the plugin they depend on (LIFO across dep chain)", async () => {
+    const ctx = createHarnessContext();
+    const pm = new PluginManager(ctx);
+
+    const order: string[] = [];
+    ctx.events.on("plugin.unloaded", (p: { id: string }) => {
+      order.push(p.id);
+    });
+
+    const a: HarnessPlugin = {
+      manifest: { id: "a", name: "A", version: "1.0.0" },
+      setup: () => {},
+    };
+    const b: HarnessPlugin = {
+      manifest: { id: "b", name: "B", version: "1.0.0", dependencies: ["a"] },
+      setup: () => {},
+    };
+    const c: HarnessPlugin = {
+      manifest: { id: "c", name: "C", version: "1.0.0", dependencies: ["b"] },
+      setup: () => {},
+    };
+
+    await pm.load(a);
+    await pm.load(b);
+    await pm.load(c);
+
+    await pm.unload("a");
+    expect(order).toEqual(["c", "b", "a"]);
+  });
+
+  it("PluginManager.unload throws for unknown plugins", async () => {
+    const ctx = createHarnessContext();
+    const pm = new PluginManager(ctx);
+    await expect(pm.unload("not-loaded")).rejects.toThrow("Plugin not loaded: not-loaded");
+  });
 });

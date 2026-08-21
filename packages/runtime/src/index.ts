@@ -185,16 +185,28 @@ export class PluginManager {
   }
 
   async unload(pluginId: string): Promise<void> {
-    const plugin = this.loaded.get(pluginId);
-    if (!plugin) {
+    if (!this.loaded.has(pluginId)) {
       throw new Error(`Plugin not loaded: ${pluginId}`);
     }
+    await this.unloadRecursive(pluginId);
+  }
 
-    // Check if other plugins depend on this one
+  /**
+   * Recursively unload every loaded plugin that declares `pluginId` as a
+   * dependency before unloading `pluginId` itself, so dependents are torn
+   * down ahead of their dependencies. Each unload emits `plugin.unloaded`
+   * so observers see the cascade in event order.
+   */
+  private async unloadRecursive(pluginId: string): Promise<void> {
+    const dependents: string[] = [];
     for (const [id, other] of this.loaded) {
+      if (id === pluginId) continue;
       if (other.manifest.dependencies?.includes(pluginId)) {
-        throw new Error(`Cannot unload ${pluginId}: depended on by ${id}`);
+        dependents.push(id);
       }
+    }
+    for (const dep of dependents) {
+      await this.unloadRecursive(dep);
     }
 
     const disposables = this.pluginDisposers.get(pluginId);
@@ -202,7 +214,6 @@ export class PluginManager {
       await disposables.dispose();
       this.pluginDisposers.delete(pluginId);
     }
-
     this.loaded.delete(pluginId);
     await this.ctx.events.emit("plugin.unloaded", { id: pluginId });
   }

@@ -186,7 +186,7 @@ Sample output (two-step transcript with the create-design tool call):
     "id": "3dc234f8-7142-47e4-b09b-e7bf74c7debf",
     "title": "Automated Design",
     "format": "presentation"
-  },
+  }
 }
 ```
 
@@ -267,7 +267,7 @@ On non-macOS hosts `doctor` reports `safetyBoundary.canvaAppDetected: false` whi
 
 ## Architectural Laws
 
-1. **Everything Replaceable (A)**: Services are registered through `PluginContext` via typed `ServiceKey<T>` contracts.
+1. **Everything Replaceable (A)**: Services are registered through `HarnessContext` via typed `ServiceKey<T>` contracts. Each profile's `bootstrapHarness()` call further narrows the surface by applying the per-profile `HarnessPolicy` (see [Concepts Reference](#concepts-reference)).
 2. **Capability Seams (B)**: Definition → Provider → Consumer separation honored throughout.
 3. **State is Reconstructable (C)**: Single source of truth (`SessionStore`) with pure projections; no in-place mutation.
 4. **The Loop is Infrastructure (D)**: The `AgentLoop` exposes lifecycle extension hooks instead of growing new branches.

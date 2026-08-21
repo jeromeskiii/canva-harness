@@ -1,0 +1,11 @@
+{
+  "name": "@canva-harness/capabilities",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@canva-harness/runtime": "workspace:*",
+    "@canva-harness/session": "workspace:*"
+  }
+}

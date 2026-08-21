@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@canva-harness/runtime": ["packages/runtime/src/index.ts"],
+      "@canva-harness/session": ["packages/session/src/index.ts"],
+      "@canva-harness/capabilities": ["packages/capabilities/src/index.ts"],
+      "@canva-harness/tools": ["packages/tools/src/index.ts"],
+      "@canva-harness/agent": ["packages/agent/src/index.ts"],
+      "@canva-harness/cli": ["packages/cli/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src/**/*", "packages/*/tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

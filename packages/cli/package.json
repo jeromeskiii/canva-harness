@@ -1,0 +1,16 @@
+{
+  "name": "@canva-harness/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "canva-harness": "./src/bin.ts"
+  },
+  "dependencies": {
+    "@canva-harness/runtime": "workspace:*",
+    "@canva-harness/session": "workspace:*",
+    "@canva-harness/capabilities": "workspace:*",
+    "@canva-harness/tools": "workspace:*",
+    "@canva-harness/agent": "workspace:*"
+  }
+}

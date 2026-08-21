@@ -16,4 +16,32 @@ describe("Canva Harness CLI & Bootstrap", () => {
     expect(tools.some((t) => t.name === "canva_create_design")).toBe(true);
     expect(tools.some((t) => t.name === "canva_validate_layout")).toBe(true);
   });
+
+  it("safe-readonly profile registers only tools with policy.readonly", async () => {
+    const harness = await bootstrapHarness("safe-readonly");
+    const names = harness.toolRegistry.list().map((t) => t.name);
+
+    expect(names).toEqual(["canva_validate_layout"]);
+    expect(harness.policy.readonlyToolsOnly).toBe(true);
+    expect(harness.policy.autoApprove).toBe(false);
+  });
+
+  it("headless profile registers all tools and pre-approves", async () => {
+    const harness = await bootstrapHarness("headless");
+
+    expect(harness.toolRegistry.list().length).toBeGreaterThanOrEqual(4);
+    expect(harness.policy.autoApprove).toBe(true);
+    expect(harness.policy.readonlyToolsOnly).toBe(false);
+  });
+
+  it.each(["developer", "brand-governance", "creative-automation"] as const)(
+    "%s registers all tools and requires explicit approval",
+    async (profile) => {
+      const harness = await bootstrapHarness(profile);
+
+      expect(harness.toolRegistry.list().length).toBeGreaterThanOrEqual(4);
+      expect(harness.policy.readonlyToolsOnly).toBe(false);
+      expect(harness.policy.autoApprove).toBe(false);
+    }
+  );
 });
